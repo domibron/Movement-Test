@@ -9,25 +9,28 @@ public class PlayerMovement_Scr : MonoBehaviour
 {
     float playerHeight = 2f;
 
+    [SerializeField] bool DebugMode = false;
+
     [SerializeField] Transform orientation;
 
     [Header("Movement")]
-    public float sprintSpeed = 10f;
-    public float moveSpeed = 4f;
-    public float airMultiplier = 1f;
-    public float movementMultiplier = 10f;
+    [SerializeField] float sprintSpeed = 10f;
+    [SerializeField] float moveSpeed = 4f;
+    [SerializeField] float airMultiplier = 1f;
+    [SerializeField] float movementMultiplier = 10f;
 
     [Header("Jumping")]
-    public float jumpForce = 5f;
+    [SerializeField] float jumpForce = 5f;
 
     [Header("Keybinds")]
-    [SerializeField] KeyCode jumpKey = KeyCode.Space;
+    [SerializeField] KeyCode jumpKey = KeyCode.Space; //can set as null and use a keybind manager
+    [SerializeField] KeyCode sprintKey = KeyCode.LeftShift;
 
-    [Header("Drag")]
-    float groundDrag = 6f;
-    float airDrag = 0f;
+    [Header("Drag and gravity")]
+    [SerializeField] float groundDrag = 6f;
+    [SerializeField] float airDrag = 0f;
 
-    float gravity;
+    [SerializeField] float gravity;
 
     float horizontalMovement;
     float verticalMovement;
@@ -35,7 +38,7 @@ public class PlayerMovement_Scr : MonoBehaviour
     [Header("Ground Detection")]
     [SerializeField] LayerMask groundMask;
     bool isGrounded;
-    float groundDistance = 0.4f;
+    float groundDistance = 0.2f;
 
     Vector3 moveDirection;
     Vector3 slopeMoveDirection;
@@ -75,6 +78,7 @@ public class PlayerMovement_Scr : MonoBehaviour
     {
         //is grounded check
         isGrounded = Physics.CheckSphere(transform.position - new Vector3(0, 1, 0), groundDistance, groundMask);
+        
 
         //runs myinput funtion and controll drag (more over this farther down)
         MyInput();
@@ -86,19 +90,40 @@ public class PlayerMovement_Scr : MonoBehaviour
             Jump();
         }
 
-        //sets the direction following the slope
-        slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
-
-        //gravity for in air
-        if (isGrounded)
+        if (Input.GetKeyDown(KeyCode.LeftControl) && isGrounded)
         {
-            gravity = 0f;
+            Crouch();
         }
         else
         {
-            gravity = Time.deltaTime * -1f;
+            Stand();
         }
+
+            //sets the direction following the slope
+            slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+
+        //gravity for in air
+        gravity = Time.deltaTime * -1f;
+
+        //moive direction so the player can control inair movement
         jumpMoveDirection = moveDirection * 0.1f;
+
+        //shows all changeable values for debbuging
+        if (DebugMode)
+        {
+            Debug.DrawRay(transform.position, Vector3.down, color: Color.red, playerHeight / 2 + 0.5f);
+
+            Debug.Log("moveDirection " + moveDirection + " jumpMoveDirection " + jumpMoveDirection 
+            + " horizontalMovement " + horizontalMovement + " verticalMovement " + verticalMovement 
+            + " isGrounded " + isGrounded + " OnSlope() " + OnSlope() + " slopeMoveDirection " + slopeMoveDirection 
+            + " gravity " + gravity + " Time.deltaTime " + Time.deltaTime);
+        }
+    }
+
+    //this draws the sphere check for debbuging
+    private void OnDrawGizmos()
+    {
+        if (DebugMode) { Gizmos.DrawSphere(transform.position - new Vector3(0, 1, 0), groundDistance); }
     }
 
     //when called it will grab movement input
@@ -115,9 +140,25 @@ public class PlayerMovement_Scr : MonoBehaviour
     //when called then the player will jump in the air
     void Jump()
     {
+        //sets the jump direction
         jumpMoveDirection = moveDirection * 0.1f;
         //add a jump force to the rigid body component.
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    void Crouch()
+    {
+        //sets to crouch size
+        Vector3 crouchSize = Vector3.zero; // had a problem here CS0165 so I added a vaule be for it is set
+        crouchSize.Set(0.7f, 0.5f, 0.7f);
+        rb.transform.localScale = crouchSize;
+    }
+
+    void Stand()
+    {
+        //sets size back to normal
+        Vector3 crouchSize = Vector3.one;
+        rb.transform.localScale = crouchSize;
     }
 
     //when called then drag will be controlled
@@ -147,7 +188,7 @@ public class PlayerMovement_Scr : MonoBehaviour
         if (isGrounded && !OnSlope())
         {
             //if left shift is held down
-            if (Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetKey(sprintKey))
             {
                 //sprint speed on flat ground
                 rb.AddForce(moveDirection.normalized * sprintSpeed * movementMultiplier, ForceMode.Acceleration);
@@ -163,7 +204,7 @@ public class PlayerMovement_Scr : MonoBehaviour
         else if (isGrounded && OnSlope())
         {
             //if left shift is held down
-            if (Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetKey(sprintKey))
             {
                 //sprint speed on slope
                 rb.AddForce(slopeMoveDirection.normalized * sprintSpeed * movementMultiplier, ForceMode.Acceleration);

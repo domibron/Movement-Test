@@ -7,44 +7,28 @@ using TMPro;
 
 public class PlayerCamMove_Scr : MonoBehaviour
 {
-    public Camera fpsCam;
-    float range = 2f;
+    [Header("Mouse sensitivity")]
 
+    //old mouse sensitivity so you can set indivisual values to the mouse. Switch this out with the sensitivityMouse
     [SerializeField] private float sensX;
     [SerializeField] private float sensY;
 
+    [SerializeField] float sensitivityMouse = 1; //DO NOT HARD SET THIS VALUE - I AM USING IT FOR EXPERIEMENTS
+
+    [SerializeField] float multiplier = 1f;
+
+    [Header("Mouse required objects")]
     [SerializeField] Transform cam;
     [SerializeField] Transform orientation;
 
-    public float sensitivityMouse;
-
     float mouseX;
     float mouseY;
-
-    float multiplier = 1f;
 
     float xRotation;
     float yRotation;
 
     private void Start()
     {
-        /*
-        //loading save values and if not default values are used instead.
-        if (Save_Manager.instance.hasLoaded)
-        {
-            sensitivityMouse = Save_Manager.instance.activeSave.MainMouseSensitivity;
-            MouseSens.value = Save_Manager.instance.activeSave.MainMouseSensitivity;
-
-        }
-        else
-        {
-            Save_Manager.instance.activeSave.MainMouseSensitivity = 1f;
-        }
-
-        //calls the load mouse settings funtion
-        LoadMouseSettings();
-        */
-
         //locks the cursor and hides it so you don't see it while playing and click out side
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
