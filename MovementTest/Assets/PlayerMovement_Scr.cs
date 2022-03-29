@@ -77,7 +77,7 @@ public class PlayerMovement_Scr : MonoBehaviour
     private void Update()
     {
         //is grounded check
-        isGrounded = Physics.CheckSphere(transform.position - new Vector3(0, 1, 0), groundDistance, groundMask);
+        isGrounded = Physics.CheckSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance, groundMask);
         
 
         //runs myinput funtion and controll drag (more over this farther down)
@@ -90,7 +90,8 @@ public class PlayerMovement_Scr : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftControl) && isGrounded)
+        if (Input.GetKey(KeyCode.C))
+
         {
             Crouch();
         }
@@ -116,14 +117,19 @@ public class PlayerMovement_Scr : MonoBehaviour
             Debug.Log("moveDirection " + moveDirection + " jumpMoveDirection " + jumpMoveDirection 
             + " horizontalMovement " + horizontalMovement + " verticalMovement " + verticalMovement 
             + " isGrounded " + isGrounded + " OnSlope() " + OnSlope() + " slopeMoveDirection " + slopeMoveDirection 
-            + " gravity " + gravity + " Time.deltaTime " + Time.deltaTime);
+            + " gravity " + gravity + " Time.deltaTime " + Time.deltaTime + " playerHeight " + playerHeight 
+            + " groundDistance " + groundDistance);
         }
+
+        //gets the player's height by getting the scale of the Rigidbody and timesing by 2 as defult is 1
+        playerHeight = rb.transform.localScale.y * 2;
+        //groundDistance = rb.transform.localScale.y * 2 / 10;
     }
 
     //this draws the sphere check for debbuging
     private void OnDrawGizmos()
     {
-        if (DebugMode) { Gizmos.DrawSphere(transform.position - new Vector3(0, 1, 0), groundDistance); }
+        if (DebugMode) { Gizmos.DrawSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance); }
     }
 
     //when called it will grab movement input
@@ -140,6 +146,7 @@ public class PlayerMovement_Scr : MonoBehaviour
     //when called then the player will jump in the air
     void Jump()
     {
+
         //sets the jump direction
         jumpMoveDirection = moveDirection * 0.1f;
         //add a jump force to the rigid body component.
@@ -149,16 +156,15 @@ public class PlayerMovement_Scr : MonoBehaviour
     void Crouch()
     {
         //sets to crouch size
-        Vector3 crouchSize = Vector3.zero; // had a problem here CS0165 so I added a vaule be for it is set
-        crouchSize.Set(0.7f, 0.5f, 0.7f);
+        Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f); // had a problem here CS0165 so I added a vaule be for it is set
         rb.transform.localScale = crouchSize;
     }
 
     void Stand()
     {
         //sets size back to normal
-        Vector3 crouchSize = Vector3.one;
-        rb.transform.localScale = crouchSize;
+        Vector3 standSize = Vector3.one;
+        rb.transform.localScale = standSize;
     }
 
     //when called then drag will be controlled
