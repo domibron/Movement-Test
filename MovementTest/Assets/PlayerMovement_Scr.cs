@@ -16,6 +16,7 @@ public class PlayerMovement_Scr : MonoBehaviour
     [Header("Movement")]
     [SerializeField] float sprintSpeed = 10f;
     [SerializeField] float moveSpeed = 4f;
+    [SerializeField] float crouchSpeed = 2f;
     [SerializeField] float airMultiplier = 1f;
     [SerializeField] float movementMultiplier = 10f;
 
@@ -45,6 +46,8 @@ public class PlayerMovement_Scr : MonoBehaviour
     Vector3 jumpMoveDirection;
 
     Rigidbody rb;
+
+    bool isCrouching = false;
 
     RaycastHit slopeHit;
 
@@ -90,7 +93,7 @@ public class PlayerMovement_Scr : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetKey(KeyCode.C))
+        if (Input.GetKey(KeyCode.C) || isGrounded)
 
         {
             Crouch();
@@ -118,7 +121,7 @@ public class PlayerMovement_Scr : MonoBehaviour
             + " horizontalMovement " + horizontalMovement + " verticalMovement " + verticalMovement 
             + " isGrounded " + isGrounded + " OnSlope() " + OnSlope() + " slopeMoveDirection " + slopeMoveDirection 
             + " gravity " + gravity + " Time.deltaTime " + Time.deltaTime + " playerHeight " + playerHeight 
-            + " groundDistance " + groundDistance);
+            + " groundDistance " + groundDistance + " isCrouching " + isCrouching);
         }
 
         //gets the player's height by getting the scale of the Rigidbody and timesing by 2 as defult is 1
@@ -155,13 +158,17 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     void Crouch()
     {
+        isCrouching = true;
         //sets to crouch size
         Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f); // had a problem here CS0165 so I added a vaule be for it is set
+        Vector3 moveDown = new(0f, crouchSize.y - playerHeight, 0f);
+        rb.AddForce(moveDown, ForceMode.VelocityChange);
         rb.transform.localScale = crouchSize;
     }
 
     void Stand()
     {
+        isCrouching = false;
         //sets size back to normal
         Vector3 standSize = Vector3.one;
         rb.transform.localScale = standSize;
@@ -194,10 +201,14 @@ public class PlayerMovement_Scr : MonoBehaviour
         if (isGrounded && !OnSlope())
         {
             //if left shift is held down
-            if (Input.GetKey(sprintKey))
+            if (Input.GetKey(sprintKey) && !isCrouching)
             {
                 //sprint speed on flat ground
                 rb.AddForce(moveDirection.normalized * sprintSpeed * movementMultiplier, ForceMode.Acceleration);
+            }
+            else if (isCrouching)
+            {
+                rb.AddForce(moveDirection.normalized * crouchSpeed * movementMultiplier, ForceMode.Acceleration);
             }
             else
             {
@@ -210,10 +221,14 @@ public class PlayerMovement_Scr : MonoBehaviour
         else if (isGrounded && OnSlope())
         {
             //if left shift is held down
-            if (Input.GetKey(sprintKey))
+            if (Input.GetKey(sprintKey) && !isCrouching)
             {
                 //sprint speed on slope
                 rb.AddForce(slopeMoveDirection.normalized * sprintSpeed * movementMultiplier, ForceMode.Acceleration);
+            }
+            else if (isCrouching)
+            {
+                rb.AddForce(slopeMoveDirection.normalized * crouchSpeed * movementMultiplier, ForceMode.Acceleration);
             }
             else
             {
