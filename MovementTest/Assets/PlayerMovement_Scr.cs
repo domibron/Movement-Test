@@ -39,7 +39,8 @@ public class PlayerMovement_Scr : MonoBehaviour
     [Header("Ground Detection")]
     [SerializeField] LayerMask groundMask;
     bool isGrounded;
-    float groundDistance = 0.2f;
+    bool isCrouchGrounded;
+    float groundDistance = 0.4f;
 
     Vector3 moveDirection;
     Vector3 slopeMoveDirection;
@@ -93,8 +94,7 @@ public class PlayerMovement_Scr : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetKey(KeyCode.C) || isGrounded)
-
+        if (Input.GetKey(KeyCode.C) && (isGrounded || isCrouchGrounded))
         {
             Crouch();
         }
@@ -126,7 +126,7 @@ public class PlayerMovement_Scr : MonoBehaviour
 
         //gets the player's height by getting the scale of the Rigidbody and timesing by 2 as defult is 1
         playerHeight = rb.transform.localScale.y * 2;
-        //groundDistance = rb.transform.localScale.y * 2 / 10;
+        groundDistance = rb.transform.localScale.y * 2 / 5;
     }
 
     //this draws the sphere check for debbuging
@@ -158,11 +158,11 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     void Crouch()
     {
+        isCrouchGrounded = (Physics.Raycast(transform.position, Vector3.down, playerHeight / 2 + 0.5f, groundMask));
+        Debug.DrawRay(transform.position, Vector3.down, color: Color.blue, playerHeight / 2 + 0.5f);
         isCrouching = true;
         //sets to crouch size
         Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f); // had a problem here CS0165 so I added a vaule be for it is set
-        Vector3 moveDown = new(0f, crouchSize.y - playerHeight, 0f);
-        rb.AddForce(moveDown, ForceMode.VelocityChange);
         rb.transform.localScale = crouchSize;
     }
 
