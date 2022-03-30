@@ -46,9 +46,9 @@ public class PlayerMovement_Scr : MonoBehaviour
     Vector3 slopeMoveDirection;
     Vector3 jumpMoveDirection;
 
-    Rigidbody rb;
-
     bool isCrouching = false;
+
+    Rigidbody rb;
 
     RaycastHit slopeHit;
 
@@ -94,7 +94,7 @@ public class PlayerMovement_Scr : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetKey(KeyCode.C) && (isGrounded || isCrouchGrounded))
+        if (Input.GetKey(KeyCode.C))//&& (isGrounded || isCrouchGrounded)
         {
             Crouch();
         }
@@ -103,8 +103,8 @@ public class PlayerMovement_Scr : MonoBehaviour
             Stand();
         }
 
-            //sets the direction following the slope
-            slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+        //sets the direction following the slope
+        slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
 
         //gravity for in air
         gravity = Time.deltaTime * -1f;
@@ -135,7 +135,6 @@ public class PlayerMovement_Scr : MonoBehaviour
         if (DebugMode) 
         { 
             Gizmos.DrawSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance);
-            Gizmos.DrawSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance);
         }
     }
 
@@ -150,23 +149,19 @@ public class PlayerMovement_Scr : MonoBehaviour
         moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
     }
 
-    //when called then the player will jump in the air
-    void Jump()
+    void Jump() //when called then the player will jump in the air
     {
-
-        //sets the jump direction
-        jumpMoveDirection = moveDirection * 0.1f;
-        //add a jump force to the rigid body component.
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        jumpMoveDirection = moveDirection * 0.1f; //sets the jump direction
+        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse); //add a jump force to the rigid body component.
     }
 
     void Crouch()
     {
-        isCrouchGrounded = Physics.CheckSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance, groundMask);
-        isCrouchGrounded = (Physics.Raycast(transform.position, Vector3.down, playerHeight / 2 + 0.5f, groundMask));
+        //isCrouchGrounded = Physics.CheckSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance, groundMask);
+        //isCrouchGrounded = (Physics.Raycast(transform.position, Vector3.down, playerHeight / 2 + 0.7f, groundMask));
         isCrouching = true;
         //sets to crouch size
-        Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f); // had a problem here CS0165 so I added a vaule be for it is set
+        Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f);
         rb.transform.localScale = crouchSize;
     }
 
