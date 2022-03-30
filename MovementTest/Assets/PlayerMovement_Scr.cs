@@ -132,7 +132,11 @@ public class PlayerMovement_Scr : MonoBehaviour
     //this draws the sphere check for debbuging
     private void OnDrawGizmos()
     {
-        if (DebugMode) { Gizmos.DrawSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance); }
+        if (DebugMode) 
+        { 
+            Gizmos.DrawSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance);
+            Gizmos.DrawSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance);
+        }
     }
 
     //when called it will grab movement input
@@ -158,8 +162,8 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     void Crouch()
     {
+        isCrouchGrounded = Physics.CheckSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance, groundMask);
         isCrouchGrounded = (Physics.Raycast(transform.position, Vector3.down, playerHeight / 2 + 0.5f, groundMask));
-        Debug.DrawRay(transform.position, Vector3.down, color: Color.blue, playerHeight / 2 + 0.5f);
         isCrouching = true;
         //sets to crouch size
         Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f); // had a problem here CS0165 so I added a vaule be for it is set
