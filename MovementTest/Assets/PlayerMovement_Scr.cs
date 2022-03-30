@@ -39,7 +39,6 @@ public class PlayerMovement_Scr : MonoBehaviour
     [Header("Ground Detection")]
     [SerializeField] LayerMask groundMask;
     bool isGrounded;
-    bool isCrouchGrounded;
     float groundDistance = 0.4f;
 
     Vector3 moveDirection;
@@ -94,7 +93,11 @@ public class PlayerMovement_Scr : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetKey(KeyCode.C))//&& (isGrounded || isCrouchGrounded)
+        if (Input.GetKeyDown(KeyCode.C) && !isCrouching && isGrounded)
+        {
+            Slide();
+        }
+        else if (Input.GetKey(KeyCode.C)) //&& (isGrounded || isCrouchGrounded)
         {
             Crouch();
         }
@@ -107,7 +110,7 @@ public class PlayerMovement_Scr : MonoBehaviour
         slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
 
         //gravity for in air
-        gravity = Time.deltaTime * -1f;
+        gravity = Time.deltaTime * -2f;
 
         //moive direction so the player can control inair movement
         jumpMoveDirection = moveDirection * 0.1f;
@@ -160,9 +163,16 @@ public class PlayerMovement_Scr : MonoBehaviour
         //isCrouchGrounded = Physics.CheckSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance, groundMask);
         //isCrouchGrounded = (Physics.Raycast(transform.position, Vector3.down, playerHeight / 2 + 0.7f, groundMask));
         isCrouching = true;
-        //sets to crouch size
-        Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f);
+        Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f); //sets to crouch size
         rb.transform.localScale = crouchSize;
+    }
+
+    void Slide()
+    {
+        isCrouching = true;
+        Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f); //sets to crouch size
+        rb.transform.localScale = crouchSize;
+        rb.AddForce(moveDirection.normalized * sprintSpeed * 0.7f, ForceMode.Impulse);
     }
 
     void Stand()
