@@ -61,6 +61,7 @@ public class WallRun_Scr : MonoBehaviour
     void StartWallRun()
     {
         rb.useGravity = false;
+        Debug.Log(rb.useGravity);
 
         rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
 
