@@ -14,11 +14,15 @@ public class PlayerMovement_Scr : MonoBehaviour
     [SerializeField] Transform orientation;
 
     [Header("Movement")]
+    
+    [SerializeField] float moveSpeed = 6f;
+    [SerializeField] float airMultiplier = 0.4f;
+    float movementMultiplier = 10f;
+
+    [Header("Sprinting")]
+    [SerializeField] float walkSpeed = 6f;
     [SerializeField] float sprintSpeed = 10f;
-    [SerializeField] float moveSpeed = 4f;
-    [SerializeField] float crouchSpeed = 2f;
-    [SerializeField] float airMultiplier = 1f;
-    [SerializeField] float movementMultiplier = 10f;
+    [SerializeField] float acceleration = 10f;
 
     [Header("Jumping")]
     [SerializeField] float jumpForce = 5f;
@@ -29,7 +33,7 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     [Header("Drag and gravity")]
     [SerializeField] float groundDrag = 6f;
-    [SerializeField] float airDrag = 0f;
+    [SerializeField] float airDrag = 2f;
 
     [SerializeField] float gravity;
 
@@ -37,9 +41,10 @@ public class PlayerMovement_Scr : MonoBehaviour
     float verticalMovement;
 
     [Header("Ground Detection")]
+    [SerializeField] Transform groundCheck;
     [SerializeField] LayerMask groundMask;
+    [SerializeField] float groundDistance = 0.4f;
     bool isGrounded;
-    float groundDistance = 0.4f;
 
     Vector3 moveDirection;
     Vector3 slopeMoveDirection;
@@ -79,13 +84,13 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     private void Update()
     {
-        //is grounded check
-        isGrounded = Physics.CheckSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance, groundMask);
-        
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask); //is grounded check
+
 
         //runs myinput funtion and controll drag (more over this farther down)
         MyInput();
         ControllDrag();
+        ControlSpeed();
 
         //allows the player to jump if they are on the ground and presses the jump key
         if (Input.GetKeyDown(jumpKey) && isGrounded)
@@ -154,7 +159,7 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     void Jump() //when called then the player will jump in the air
     {
-        jumpMoveDirection = moveDirection * 0.1f; //sets the jump direction
+        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse); //add a jump force to the rigid body component.
     }
 
@@ -183,6 +188,18 @@ public class PlayerMovement_Scr : MonoBehaviour
         rb.transform.localScale = standSize;
     }
 
+    void ControlSpeed()
+    {
+        if (Input.GetKey(sprintKey) && isGrounded)
+        {
+            moveSpeed = Mathf.Lerp(moveSpeed, sprintSpeed, acceleration * Time.deltaTime);
+        }
+        else
+        {
+            moveSpeed = Mathf.Lerp(moveSpeed, walkSpeed, acceleration * Time.deltaTime);
+        }
+    }
+
     //when called then drag will be controlled
     void ControllDrag()
     {
@@ -209,49 +226,22 @@ public class PlayerMovement_Scr : MonoBehaviour
         //if on the ground but not on a slope
         if (isGrounded && !OnSlope())
         {
-            //if left shift is held down
-            if (Input.GetKey(sprintKey) && !isCrouching)
-            {
-                //sprint speed on flat ground
-                rb.AddForce(moveDirection.normalized * sprintSpeed * movementMultiplier, ForceMode.Acceleration);
-            }
-            else if (isCrouching)
-            {
-                rb.AddForce(moveDirection.normalized * crouchSpeed * movementMultiplier, ForceMode.Acceleration);
-            }
-            else
-            {
-                //walk speed on flat ground
-                rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
-            }
+            //walk speed on flat ground
+            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
         }
 
         //if the player is on the ground and on a slope
         else if (isGrounded && OnSlope())
         {
-            //if left shift is held down
-            if (Input.GetKey(sprintKey) && !isCrouching)
-            {
-                //sprint speed on slope
-                rb.AddForce(slopeMoveDirection.normalized * sprintSpeed * movementMultiplier, ForceMode.Acceleration);
-            }
-            else if (isCrouching)
-            {
-                rb.AddForce(slopeMoveDirection.normalized * crouchSpeed * movementMultiplier, ForceMode.Acceleration);
-            }
-            else
-            {
-                //walk speed on slope
-                rb.AddForce(slopeMoveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
-            }
+            //walk speed on slope
+            rb.AddForce(slopeMoveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
         }
 
         //if the player is not on the ground
         else if (!isGrounded)
         {
             //jumping in mid air force with a downwards force
-            rb.AddForce(jumpMoveDirection.normalized * moveSpeed * airMultiplier, ForceMode.Acceleration);
-            rb.AddForce(0, gravity * 17f, 0, ForceMode.Acceleration);
+            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration); ;
         }
     }
 }
