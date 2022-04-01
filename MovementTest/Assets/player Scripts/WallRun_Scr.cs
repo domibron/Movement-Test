@@ -4,24 +4,33 @@ using UnityEngine;
 
 public class WallRun_Scr : MonoBehaviour
 {
-    [Header("Movement")]
+    [Header("Refernces")]
     [SerializeField] Transform orientation;
+    [SerializeField] private Camera cam;
+    [SerializeField] private Rigidbody rb;
 
-    [Header("Wall Running")]
+    [Header("Wall Running checks")]
     [SerializeField] float wallDistance = .5f;
     [SerializeField] float minimumJumpHeight = 1.5f;
 
-    [Header("Wall Running")]
+    [Header("Wall Running forces")]
     [SerializeField] private float wallRunGravity;
     [SerializeField] private float wallRunJumpForce;
+
+    [Header("Camera settings")]
+    [SerializeField] private float fov;
+    [SerializeField] private float wallRunfov;
+    [SerializeField] private float wallRunfovTime;
+    [SerializeField] private float camTilt;
+    [SerializeField] private float camTiltTime;
+
+    public float tilt { get; private set; }
 
     bool wallLeft = false;
     bool wallRight = false;
 
     RaycastHit leftWallHit;
     RaycastHit rightWallHit;
-
-    [SerializeField] private Rigidbody rb;
 
     bool canWallRun()
     {
@@ -34,21 +43,15 @@ public class WallRun_Scr : MonoBehaviour
         wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallHit, wallDistance);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         CheckWall();
 
         if (canWallRun())
         {
-            if (wallLeft)
+            if (wallLeft || wallRight)
             {
                 StartWallRun();
-                Debug.Log("wall running left");
-            }
-            else if (wallRight)
-            {
-                StartWallRun();
-                Debug.Log("wall running right");
             }
             else
             {
@@ -61,9 +64,15 @@ public class WallRun_Scr : MonoBehaviour
     void StartWallRun()
     {
         rb.useGravity = false;
-        Debug.Log(rb.useGravity);
 
         rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
+
+        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, wallRunfov, wallRunfovTime * Time.deltaTime);
+
+        if (wallLeft)
+            tilt = Mathf.Lerp(tilt, -camTilt, camTiltTime * Time.deltaTime);
+        else if (wallRight)
+            tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime);
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -85,5 +94,8 @@ public class WallRun_Scr : MonoBehaviour
     void StopWallRun()
     {
         rb.useGravity = true;
+
+        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, fov, wallRunfovTime * Time.deltaTime);
+        tilt = Mathf.Lerp(tilt, 0, camTiltTime * Time.deltaTime);
     }
 }
