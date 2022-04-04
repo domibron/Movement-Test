@@ -43,7 +43,7 @@ public class WallRun_Scr : MonoBehaviour
         wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallHit, wallDistance);
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
         CheckWall();
 
@@ -58,7 +58,6 @@ public class WallRun_Scr : MonoBehaviour
                 StopWallRun();
             }
         }
-        StopWallRun();
     }
 
     void StartWallRun()
