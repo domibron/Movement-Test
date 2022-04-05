@@ -16,6 +16,7 @@ public class WallRun_Scr : MonoBehaviour
     [Header("Wall Running forces")]
     [SerializeField] private float wallRunGravity;
     [SerializeField] private float wallRunJumpForce;
+    [SerializeField] private float wallRunSpeed;
 
     [Header("Camera settings")]
     [SerializeField] private float fov;
@@ -45,6 +46,11 @@ public class WallRun_Scr : MonoBehaviour
 
     void FixedUpdate()
     {
+        WallRun();
+    }
+
+    void WallRun()
+    {
         CheckWall();
 
         if (canWallRun())
@@ -52,12 +58,15 @@ public class WallRun_Scr : MonoBehaviour
             if (wallLeft || wallRight)
             {
                 StartWallRun();
+                return;
             }
             else
             {
                 StopWallRun();
+                return;
             }
         }
+        StopWallRun();
     }
 
     void StartWallRun()
@@ -88,6 +97,8 @@ public class WallRun_Scr : MonoBehaviour
                 rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
             }
         }
+
+        rb.AddForce(orientation.forward * wallRunSpeed, ForceMode.Acceleration);
     }
 
     void StopWallRun()

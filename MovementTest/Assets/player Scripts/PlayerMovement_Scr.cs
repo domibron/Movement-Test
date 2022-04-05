@@ -241,7 +241,7 @@ public class PlayerMovement_Scr : MonoBehaviour
         else if (!isGrounded)
         {
             //jumping in mid air force with a downwards force
-            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration); ;
+            rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration);
         }
     }
 }
