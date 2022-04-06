@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class WallRun_Scr : MonoBehaviour
 {
+    [SerializeField] float CHANGETHISVALUE = 1;
+
     [Header("Refernces")]
     [SerializeField] Transform orientation;
     [SerializeField] Camera cam;
@@ -77,13 +79,13 @@ public class WallRun_Scr : MonoBehaviour
             if (wallLeft)
             {
                 Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, 1, rb.velocity.y);
+                rb.velocity = new Vector3(rb.velocity.x, CHANGETHISVALUE, rb.velocity.y);
                 rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
             }
             else if (wallRight)
             {
                 Vector3 wallRunJumpDirection = transform.up + rightWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, 1, rb.velocity.y);
+                rb.velocity = new Vector3(rb.velocity.x, CHANGETHISVALUE, rb.velocity.y);
                 rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
             }
         }
