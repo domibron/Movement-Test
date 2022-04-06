@@ -9,8 +9,6 @@ public class PlayerMovement_Scr : MonoBehaviour
 {
     float playerHeight = 2f;
 
-    [SerializeField] bool DebugMode = false;
-
     [SerializeField] Transform orientation;
 
     [Header("Movement")]
@@ -34,8 +32,6 @@ public class PlayerMovement_Scr : MonoBehaviour
     [Header("Drag and gravity")]
     [SerializeField] float groundDrag = 6f;
     [SerializeField] float airDrag = 2f;
-
-    [SerializeField] float gravity;
 
     float horizontalMovement;
     float verticalMovement;
@@ -113,9 +109,6 @@ public class PlayerMovement_Scr : MonoBehaviour
 
         //sets the direction following the slope
         slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
-
-        //gravity for in air
-        gravity = Time.deltaTime * -2f;
 
         //moive direction so the player can control inair movement
         jumpMoveDirection = moveDirection * 0.1f;

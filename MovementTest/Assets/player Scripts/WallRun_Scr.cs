@@ -101,8 +101,7 @@ public class WallRun_Scr : MonoBehaviour
         else if (wallRight)
             tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime);
 
-
-        //rb.AddForce(orientation.forward * wallRunSpeed, ForceMode.Acceleration);
+        rb.AddForce(orientation.forward * wallRunSpeed, ForceMode.Acceleration);
     }
 
     void StopWallRun()

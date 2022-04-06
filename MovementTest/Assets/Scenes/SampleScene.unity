@@ -696,19 +696,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ce28b8c45934a94588cd2ae1d4a0171, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DebugMode: 0
   orientation: {fileID: 966457352}
   moveSpeed: 4
   airMultiplier: 0.2
-  walkSpeed: 4
-  sprintSpeed: 10
+  walkSpeed: 3
+  sprintSpeed: 7
   acceleration: 10
-  jumpForce: 120
+  jumpForce: 90
   jumpKey: 32
   sprintKey: 304
   groundDrag: 6
   airDrag: 0.2
-  gravity: 0
   groundCheck: {fileID: 1864916993}
   groundMask:
     serializedVersion: 2
