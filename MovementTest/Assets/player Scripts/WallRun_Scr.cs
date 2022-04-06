@@ -6,24 +6,24 @@ public class WallRun_Scr : MonoBehaviour
 {
     [Header("Refernces")]
     [SerializeField] Transform orientation;
-    [SerializeField] private Camera cam;
-    [SerializeField] private Rigidbody rb;
+    [SerializeField] Camera cam;
+    [SerializeField] Rigidbody rb;
 
     [Header("Wall Running checks")]
     [SerializeField] float wallDistance = .5f;
     [SerializeField] float minimumJumpHeight = 1.5f;
 
     [Header("Wall Running forces")]
-    [SerializeField] private float wallRunGravity;
-    [SerializeField] private float wallRunJumpForce;
-    [SerializeField] private float wallRunSpeed;
+    [SerializeField] float wallRunGravity;
+    [SerializeField] float wallRunJumpForce;
+    [SerializeField] float wallRunSpeed;
 
     [Header("Camera settings")]
-    [SerializeField] private float fov;
-    [SerializeField] private float wallRunfov;
-    [SerializeField] private float wallRunfovTime;
-    [SerializeField] private float camTilt;
-    [SerializeField] private float camTiltTime;
+    [SerializeField] float fov;
+    [SerializeField] float wallRunfov;
+    [SerializeField] float wallRunfovTime;
+    [SerializeField] float camTilt;
+    [SerializeField] float camTiltTime;
 
     public float tilt { get; private set; }
 
@@ -58,19 +58,36 @@ public class WallRun_Scr : MonoBehaviour
             if (wallLeft || wallRight)
             {
                 StartWallRun();
-                return;
             }
             else
             {
                 StopWallRun();
-                return;
             }
         }
-        StopWallRun();
+        else
+        {
+            StopWallRun();
+        }
     }
 
     void StartWallRun()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (wallLeft)
+            {
+                Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal;
+                rb.velocity = new Vector3(rb.velocity.x, 1, rb.velocity.y);
+                rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
+            }
+            else if (wallRight)
+            {
+                Vector3 wallRunJumpDirection = transform.up + rightWallHit.normal;
+                rb.velocity = new Vector3(rb.velocity.x, 1, rb.velocity.y);
+                rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
+            }
+        }
+
         rb.useGravity = false;
 
         rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
@@ -82,23 +99,8 @@ public class WallRun_Scr : MonoBehaviour
         else if (wallRight)
             tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime);
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (wallLeft)
-            {
-                Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.y);
-                rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
-            }
-            else if (wallRight)
-            {
-                Vector3 wallRunJumpDirection = transform.up + rightWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.y);
-                rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
-            }
-        }
 
-        rb.AddForce(orientation.forward * wallRunSpeed, ForceMode.Acceleration);
+        //rb.AddForce(orientation.forward * wallRunSpeed, ForceMode.Acceleration);
     }
 
     void StopWallRun()

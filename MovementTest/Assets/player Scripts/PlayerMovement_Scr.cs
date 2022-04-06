@@ -120,30 +120,9 @@ public class PlayerMovement_Scr : MonoBehaviour
         //moive direction so the player can control inair movement
         jumpMoveDirection = moveDirection * 0.1f;
 
-        //shows all changeable values for debbuging
-        if (DebugMode)
-        {
-            Debug.DrawRay(transform.position, Vector3.down, color: Color.red, playerHeight / 2 + 0.5f);
-
-            Debug.Log("moveDirection " + moveDirection + " jumpMoveDirection " + jumpMoveDirection 
-            + " horizontalMovement " + horizontalMovement + " verticalMovement " + verticalMovement 
-            + " isGrounded " + isGrounded + " OnSlope() " + OnSlope() + " slopeMoveDirection " + slopeMoveDirection 
-            + " gravity " + gravity + " Time.deltaTime " + Time.deltaTime + " playerHeight " + playerHeight 
-            + " groundDistance " + groundDistance + " isCrouching " + isCrouching);
-        }
-
         //gets the player's height by getting the scale of the Rigidbody and timesing by 2 as defult is 1
         playerHeight = rb.transform.localScale.y * 2;
         groundDistance = rb.transform.localScale.y * 2 / 5;
-    }
-
-    //this draws the sphere check for debbuging
-    private void OnDrawGizmos()
-    {
-        if (DebugMode) 
-        { 
-            Gizmos.DrawSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance);
-        }
     }
 
     //when called it will grab movement input
