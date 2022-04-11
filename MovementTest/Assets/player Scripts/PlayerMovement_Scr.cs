@@ -94,11 +94,11 @@ public class PlayerMovement_Scr : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetKeyDown(KeyCode.C) && !isCrouching && isGrounded)
+        if (Input.GetKeyDown(KeyCode.C) && !isCrouching && isGrounded && Input.GetAxis("Vertical") > 0)
         {
             Slide();
         }
-        else if (Input.GetKey(KeyCode.C)) //&& (isGrounded || isCrouchGrounded)
+        else if (Input.GetKey(KeyCode.C) && isGrounded)
         {
             Crouch();
         }
@@ -137,32 +137,28 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     void Crouch()
     {
-        //isCrouchGrounded = Physics.CheckSphere(transform.position - new Vector3(0f, playerHeight / 2f, 0f), groundDistance, groundMask);
-        //isCrouchGrounded = (Physics.Raycast(transform.position, Vector3.down, playerHeight / 2 + 0.7f, groundMask));
         isCrouching = true;
-        Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f); //sets to crouch size
-        rb.transform.localScale = crouchSize;
+        groundDistance = 1f;
+        rb.transform.localScale = new Vector3(1f, 0.5f, 1f); // sets to crouch size
     }
 
     void Slide()
     {
         isCrouching = true;
-        Vector3 crouchSize = new Vector3(0.7f, 0.5f, 0.7f); //sets to crouch size
-        rb.transform.localScale = crouchSize;
-        rb.AddForce(moveDirection.normalized * sprintSpeed * 0.7f, ForceMode.Impulse);
+        rb.transform.localScale = new Vector3(1f, 0.5f, 1f);
+        rb.AddForce(moveDirection.normalized * sprintSpeed * 1.2f, ForceMode.Impulse);
     }
 
     void Stand()
     {
+        groundDistance = 0.4f;
         isCrouching = false;
-        //sets size back to normal
-        Vector3 standSize = Vector3.one;
-        rb.transform.localScale = standSize;
+        rb.transform.localScale = Vector3.one; // sets size back to normal
     }
 
     void ControlSpeed()
     {
-        if (Input.GetKey(sprintKey) && isGrounded)
+        if (Input.GetKey(sprintKey) && Input.GetAxis("Vertical") > 0 && isGrounded)
         {
             moveSpeed = Mathf.Lerp(moveSpeed, sprintSpeed, acceleration * Time.deltaTime);
         }

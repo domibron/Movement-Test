@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class WallRun_Scr : MonoBehaviour
 {
-    [SerializeField] float CHANGETHISVALUE = 1;
-
     [Header("Refernces")]
     [SerializeField] Transform orientation;
     [SerializeField] Camera cam;
@@ -19,6 +17,7 @@ public class WallRun_Scr : MonoBehaviour
     [SerializeField] float wallRunGravity;
     [SerializeField] float wallRunJumpForce;
     [SerializeField] float wallRunSpeed;
+    [SerializeField] float wallRunDesiredHeight;
 
     [Header("Camera settings")]
     [SerializeField] float fov;
@@ -46,7 +45,7 @@ public class WallRun_Scr : MonoBehaviour
         wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallHit, wallDistance);
     }
 
-    void FixedUpdate()
+    void Update()
     {
         WallRun();
     }
@@ -79,15 +78,19 @@ public class WallRun_Scr : MonoBehaviour
             if (wallLeft)
             {
                 Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, CHANGETHISVALUE, rb.velocity.y);
+                rb.velocity = new Vector3(rb.velocity.x, wallRunDesiredHeight, rb.velocity.z);
                 rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
             }
             else if (wallRight)
             {
                 Vector3 wallRunJumpDirection = transform.up + rightWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, CHANGETHISVALUE, rb.velocity.y);
+                rb.velocity = new Vector3(rb.velocity.x, wallRunDesiredHeight, rb.velocity.z);
                 rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
             }
+        }
+        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.S))
+        {
+            StopWallRun();
         }
 
         rb.useGravity = false;
@@ -101,7 +104,7 @@ public class WallRun_Scr : MonoBehaviour
         else if (wallRight)
             tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime);
 
-        rb.AddForce(orientation.forward * wallRunSpeed, ForceMode.Acceleration);
+        rb.AddForce(orientation.forward * wallRunSpeed, ForceMode.Force);
     }
 
     void StopWallRun()
