@@ -47,6 +47,7 @@ public class PlayerMovement_Scr : MonoBehaviour
     Vector3 jumpMoveDirection;
 
     bool isCrouching = false;
+    bool isSliding = false;
 
     Rigidbody rb;
 
@@ -94,7 +95,7 @@ public class PlayerMovement_Scr : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetKeyDown(KeyCode.C) && !isCrouching && isGrounded && Input.GetAxis("Vertical") > 0)
+        if (Input.GetKeyDown(KeyCode.C) && isGrounded && !isCrouching && Input.GetAxis("Vertical") > 0)
         {
             Slide();
         }
@@ -137,9 +138,13 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     void Crouch()
     {
+        if (!isCrouching)
+        {
+            rb.transform.position = new Vector3(rb.transform.position.x, rb.transform.position.y - (playerHeight / 3.2f), rb.transform.position.z);
+            isGrounded = true;
+        }
         isCrouching = true;
         rb.transform.localScale = new Vector3(1f, 0.5f, 1f); // sets to crouch size
-        groundDistance = 100000f;
     }
 
     private void OnDrawGizmos()
@@ -149,23 +154,46 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     void Slide()
     {
-        isCrouching = true;
-        rb.transform.localScale = new Vector3(1f, 0.5f, 1f);
-        rb.AddForce(moveDirection.normalized * sprintSpeed * 1.5f, ForceMode.Impulse);
+        if (!isCrouching)
+        {
+            rb.transform.position = new Vector3(rb.transform.position.x, rb.transform.position.y - (playerHeight / 3.2f), rb.transform.position.z);
+            isGrounded = true;
+        }
+        if (!isSliding)
+        {
+            rb.transform.localScale = new Vector3(1f, 0.5f, 1f);
+            rb.AddForce(moveDirection.normalized * sprintSpeed * 3f, ForceMode.Impulse);
+        }
+        isSliding = true;
     }
 
     void Stand()
     {
         isCrouching = false;
         rb.transform.localScale = Vector3.one; // sets size back to normal
-        groundDistance = 0.4f;
     }
 
     void ControlSpeed()
     {
-        if (Input.GetKey(sprintKey) && Input.GetAxis("Vertical") > 0 && isGrounded)
+        if (Input.GetKey(sprintKey) && Input.GetAxis("Vertical") > 0 && isGrounded && !isCrouching)
         {
             moveSpeed = Mathf.Lerp(moveSpeed, sprintSpeed, acceleration * Time.deltaTime);
+        }
+        else if (isSliding)
+        {
+            if (rb.velocity.magnitude > 2)
+            {
+                isSliding = true;
+            }
+            else
+            {
+                isSliding = false;
+                isCrouching = true;
+            }
+        }
+        else if (isCrouching)
+        {
+            moveSpeed = Mathf.Lerp(moveSpeed, walkSpeed - 0.2f, acceleration * Time.deltaTime);
         }
         else
         {
