@@ -138,22 +138,27 @@ public class PlayerMovement_Scr : MonoBehaviour
     void Crouch()
     {
         isCrouching = true;
-        groundDistance = 1f;
         rb.transform.localScale = new Vector3(1f, 0.5f, 1f); // sets to crouch size
+        groundDistance = 100000f;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(groundCheck.position, groundDistance);
     }
 
     void Slide()
     {
         isCrouching = true;
         rb.transform.localScale = new Vector3(1f, 0.5f, 1f);
-        rb.AddForce(moveDirection.normalized * sprintSpeed * 1.2f, ForceMode.Impulse);
+        rb.AddForce(moveDirection.normalized * sprintSpeed * 1.5f, ForceMode.Impulse);
     }
 
     void Stand()
     {
-        groundDistance = 0.4f;
         isCrouching = false;
         rb.transform.localScale = Vector3.one; // sets size back to normal
+        groundDistance = 0.4f;
     }
 
     void ControlSpeed()
