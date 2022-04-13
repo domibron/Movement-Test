@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class CamFollowPlayer_Scr : MonoBehaviour
 {
-    [SerializeField] Transform cameraPosition;
+    [SerializeField] Transform cameraPosition; // gets the camera position game object
 
     void Update()
     {
-        //sets the camera position to the camera position on the player
-        transform.position = cameraPosition.position;
+        transform.position = cameraPosition.position; // sets the camera position to the camera position on the player hirachy in the inspector
     }
 }

@@ -34,84 +34,84 @@ public class WallRun_Scr : MonoBehaviour
     RaycastHit leftWallHit;
     RaycastHit rightWallHit;
 
-    bool canWallRun()
+    bool canWallRun() // runs a ground check
     {
-        return !Physics.Raycast(transform.position, Vector3.down, minimumJumpHeight);
+        return !Physics.Raycast(transform.position, Vector3.down, minimumJumpHeight); // this returns the opposite of the raycast hit to see if your in mid air
     }
 
-    void CheckWall()
+    void CheckWall() // checks what side the wall is on
     {
-        wallLeft = Physics.Raycast(transform.position, -orientation.right, out leftWallHit, wallDistance);
-        wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallHit, wallDistance);
+        wallLeft = Physics.Raycast(transform.position, -orientation.right, out leftWallHit, wallDistance); // sends out a raycast to the left and sets left to ture if hit
+        wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallHit, wallDistance); // sends out a raycast to the right and sets right to true if hit
     }
 
-    void Update()
+    void Update() // runs all wallrun functions every frame
     {
-        WallRun();
+        WallRun(); // called the wall run manager
     }
 
-    void WallRun()
+    void WallRun() // this manages the wall running
     {
-        CheckWall();
+        CheckWall(); // calles the check wall to see what side the wall is on
 
-        if (canWallRun())
+        if (canWallRun()) // check if the player can wall run by runnung the check
         {
-            if (wallLeft || wallRight)
+            if (wallLeft || wallRight) // checks if the player has a wall to their side
             {
-                StartWallRun();
+                StartWallRun(); // if the player has a wall to the side they will begin to wall run
             }
-            else
+            else // if not then they will not or stop wall running
             {
-                StopWallRun();
-            }
-        }
-        else
-        {
-            StopWallRun();
-        }
-    }
-
-    void StartWallRun()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (wallLeft)
-            {
-                Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, wallRunDesiredHeight, rb.velocity.z);
-                rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
-            }
-            else if (wallRight)
-            {
-                Vector3 wallRunJumpDirection = transform.up + rightWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, wallRunDesiredHeight, rb.velocity.z);
-                rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force);
+                StopWallRun(); // calles the stop wall running
             }
         }
-        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.S))
+        else // this stops the player from wall running when if they're touching the wall still
         {
-            StopWallRun();
+            StopWallRun(); // calles the stop wall run function
         }
-
-        rb.useGravity = false;
-
-        rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
-
-        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, wallRunfov, wallRunfovTime * Time.deltaTime);
-
-        if (wallLeft)
-            tilt = Mathf.Lerp(tilt, -camTilt, camTiltTime * Time.deltaTime);
-        else if (wallRight)
-            tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime);
-
-        rb.AddForce(orientation.forward * wallRunSpeed, ForceMode.Force);
     }
 
-    void StopWallRun()
+    void StartWallRun() // the wall running script
     {
-        rb.useGravity = true;
+        if (Input.GetKeyDown(KeyCode.Space)) // checks if the player presses space
+        {
+            if (wallLeft) // if the wall is to the left and space is pressed
+            {
+                Vector3 wallRunJumpDirection = transform.up + leftWallHit.normal; // this will return the direction of the face of the wall
+                rb.velocity = new Vector3(rb.velocity.x, wallRunDesiredHeight, rb.velocity.z); // will set y > 0 or it will make the player fall
+                rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force); // this applies the jump force (left and right)
+            }
+            else if (wallRight) // if the wall is to the right and space is pressed
+            {
+                Vector3 wallRunJumpDirection = transform.up + rightWallHit.normal; // this will return the direction of the face of the wall
+                rb.velocity = new Vector3(rb.velocity.x, wallRunDesiredHeight, rb.velocity.z); // will set y > 0 or it will make the player fall
+                rb.AddForce(wallRunJumpDirection * wallRunJumpForce * 100, ForceMode.Force); // this applies the jump force (left and right)
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.S)) // checks if the player presses and other movement so it will make the player fall
+        {
+            StopWallRun(); // calls the stop wall run fuction
+        }
 
-        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, fov, wallRunfovTime * Time.deltaTime);
-        tilt = Mathf.Lerp(tilt, 0, camTiltTime * Time.deltaTime);
+        rb.useGravity = false; // this stop normal gravity of pulling the player down at 9.81f allowing for custom gravity
+
+        rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force); // this applies the custom gravity to the player
+
+        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, wallRunfov, wallRunfovTime * Time.deltaTime); // this will lerp from the defult fov to the wall run fov over desired time
+
+        if (wallLeft) // checks what side the wall is
+            tilt = Mathf.Lerp(tilt, -camTilt, camTiltTime * Time.deltaTime); // this tilts the camera to the desired tilt opposite to the wall
+        else if (wallRight) // checks what side the wall is
+            tilt = Mathf.Lerp(tilt, camTilt, camTiltTime * Time.deltaTime); // this tilts the camera to the desired tilt opposite to the wall
+
+        rb.AddForce(orientation.forward * wallRunSpeed, ForceMode.Force); // this makes the player move forward because if you stop you fall
+    }
+
+    void StopWallRun() // the stop wall run function
+    {
+        rb.useGravity = true; // turns back on the normal gravity
+
+        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, fov, wallRunfovTime * Time.deltaTime); // sets fov back to normal
+        tilt = Mathf.Lerp(tilt, 0, camTiltTime * Time.deltaTime); // set the tilt back to normal
     }
 }

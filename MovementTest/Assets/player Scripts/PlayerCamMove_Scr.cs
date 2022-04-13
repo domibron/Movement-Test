@@ -15,7 +15,7 @@ public class PlayerCamMove_Scr : MonoBehaviour
     [SerializeField] private float sensX;
     [SerializeField] private float sensY;
 
-    [SerializeField] float sensitivityMouse = 1; //DO NOT HARD SET THIS VALUE - I AM USING IT FOR EXPERIEMENTS
+    [SerializeField] float sensitivityMouse = 1; //DO NOT HARD SET THIS VALUE - USE A SCRIPT TO MANAGE SETTINGS
 
     [SerializeField] float multiplier = 0.01f;
 
@@ -32,27 +32,23 @@ public class PlayerCamMove_Scr : MonoBehaviour
 
     private void Start()
     {
-        cam = GetComponentInChildren<Camera>();
-        //locks the cursor and hides it so you don't see it while playing and click out side
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        cam = GetComponentInChildren<Camera>(); // this gets the camera component and sets cam 
+        Cursor.lockState = CursorLockMode.Locked; // this locks the cursor
+        Cursor.visible = false; // this hide the cursor
     }
 
     private void Update()
     {
-        //gets the mouse input
-        mouseX = Input.GetAxisRaw("Mouse X");
-        mouseY = Input.GetAxisRaw("Mouse Y");
+        mouseX = Input.GetAxisRaw("Mouse X"); // this gets the X (left and right) mouse input
+        mouseY = Input.GetAxisRaw("Mouse Y"); // this gets the Y (up and down) mouse input
 
-        //final mouse rotation
-        yRotation += mouseX * sensitivityMouse * multiplier;
-        xRotation -= mouseY * sensitivityMouse * multiplier;
+        yRotation += mouseX * sensitivityMouse * multiplier; // this set the sensitvity and other values to the total mouse rotation
+        xRotation -= mouseY * sensitivityMouse * multiplier; // this set the sensitvity and other values to the total mouse rotation
 
-        //clamps the rotaion for Up and Down so you can't flip your screen
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f); // this clamps the up down so you cannot flip the camera
 
-        //rotates the camera and the orientation
-        cam.transform.localRotation = Quaternion.Euler(xRotation, yRotation, wallRun.tilt);
-        orientation.transform.rotation = Quaternion.Euler(0, yRotation, 0);
+        
+        cam.transform.localRotation = Quaternion.Euler(xRotation, yRotation, wallRun.tilt); // this rotates the camera seperatly (up and down)
+        orientation.transform.rotation = Quaternion.Euler(0, yRotation, 0); // this rotates the orientation (left and right)
     }
 }
