@@ -99,7 +99,7 @@ public class PlayerMovement_Scr : MonoBehaviour
         {
             Slide();
         }
-        else if (Input.GetKey(KeyCode.C) && isGrounded)
+        else if (Input.GetKey(KeyCode.C) || Physics.Raycast(transform.position, Vector3.up, (playerHeight / 2) + 0.2f))
         {
             Crouch();
         }
@@ -138,11 +138,6 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     void Crouch()
     {
-        if (!isCrouching)
-        {
-            rb.transform.position = new Vector3(rb.transform.position.x, rb.transform.position.y - (playerHeight / 3.2f), rb.transform.position.z);
-            isGrounded = true;
-        }
         isCrouching = true;
         rb.transform.localScale = new Vector3(1f, 0.5f, 1f); // sets to crouch size
     }
@@ -154,15 +149,10 @@ public class PlayerMovement_Scr : MonoBehaviour
 
     void Slide()
     {
-        if (!isCrouching)
-        {
-            rb.transform.position = new Vector3(rb.transform.position.x, rb.transform.position.y - (playerHeight / 3.2f), rb.transform.position.z);
-            isGrounded = true;
-        }
         if (!isSliding)
         {
             rb.transform.localScale = new Vector3(1f, 0.5f, 1f);
-            rb.AddForce(moveDirection.normalized * sprintSpeed * 3f, ForceMode.Impulse);
+            rb.AddForce(moveDirection.normalized * sprintSpeed * 30f, ForceMode.Impulse);
         }
         isSliding = true;
     }
@@ -193,7 +183,7 @@ public class PlayerMovement_Scr : MonoBehaviour
         }
         else if (isCrouching)
         {
-            moveSpeed = Mathf.Lerp(moveSpeed, walkSpeed - 0.2f, acceleration * Time.deltaTime);
+            moveSpeed = Mathf.Lerp(moveSpeed, walkSpeed - 0.35f, acceleration * Time.deltaTime);
         }
         else
         {
@@ -243,6 +233,7 @@ public class PlayerMovement_Scr : MonoBehaviour
         {
             //jumping in mid air force with a downwards force
             rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration);
+            rb.useGravity = true;
         }
     }
 }

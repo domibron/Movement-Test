@@ -12,6 +12,7 @@ public class WallRun_Scr : MonoBehaviour
     [Header("Wall Running checks")]
     [SerializeField] float wallDistance = .5f;
     [SerializeField] float minimumJumpHeight = 1.5f;
+    [SerializeField] LayerMask wallMask;
 
     [Header("Wall Running forces")]
     [SerializeField] float wallRunGravity;
@@ -36,7 +37,7 @@ public class WallRun_Scr : MonoBehaviour
 
     bool canWallRun() // runs a ground check
     {
-        return !Physics.Raycast(transform.position, Vector3.down, minimumJumpHeight); // this returns the opposite of the raycast hit to see if your in mid air
+        return !Physics.Raycast(transform.position, Vector3.down, minimumJumpHeight, wallMask); // this returns the opposite of the raycast hit to see if your in mid air
     }
 
     void CheckWall() // checks what side the wall is on
