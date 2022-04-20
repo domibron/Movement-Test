@@ -37,13 +37,13 @@ public class WallRun_Scr : MonoBehaviour
 
     bool canWallRun() // runs a ground check
     {
-        return !Physics.Raycast(transform.position, Vector3.down, minimumJumpHeight, wallMask); // this returns the opposite of the raycast hit to see if your in mid air
+        return !Physics.Raycast(transform.position, Vector3.down, minimumJumpHeight); // this returns the opposite of the raycast hit to see if your in mid air
     }
 
     void CheckWall() // checks what side the wall is on
     {
-        wallLeft = Physics.Raycast(transform.position, -orientation.right, out leftWallHit, wallDistance); // sends out a raycast to the left and sets left to ture if hit
-        wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallHit, wallDistance); // sends out a raycast to the right and sets right to true if hit
+        wallLeft = Physics.Raycast(transform.position, -orientation.right, out leftWallHit, wallDistance, wallMask); // sends out a raycast to the left and sets left to ture if hit
+        wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallHit, wallDistance, wallMask); // sends out a raycast to the right and sets right to true if hit
     }
 
     void Update() // runs all wallrun functions every frame
